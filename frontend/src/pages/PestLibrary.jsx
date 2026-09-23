@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar.jsx';
 import BackButton from '../components/BackButton.jsx';
+import { API_BASE_URL } from '../lib/api';
 
 const PestLibrary = () => {
   const [pests, setPests] = useState([]);
@@ -14,17 +15,19 @@ const PestLibrary = () => {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     filterPests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pests, searchTerm, selectedCrop]);
 
   const fetchData = async () => {
     try {
       const [pestsRes, cropsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/pests'),
-        axios.get('http://localhost:5000/api/crops')
+        axios.get(`${API_BASE_URL}/api/pests`),
+        axios.get(`${API_BASE_URL}/api/crops`)
       ]);
       setPests(pestsRes.data);
       setCrops(cropsRes.data);
@@ -149,7 +152,7 @@ const PestLibrary = () => {
                   <div className="relative h-44 bg-gradient-to-br from-amber-100/60 to-orange-50 flex items-center justify-center overflow-hidden border-b border-slate-100">
                     {pest.images && pest.images.length > 0 && pest.images[0] ? (
                       <img
-                        src={pest.images[0].startsWith('http') ? pest.images[0] : `http://localhost:5000${pest.images[0]}`}
+                        src={pest.images[0].startsWith('http') ? pest.images[0] : `${API_BASE_URL}${pest.images[0]}`}
                         alt={pest.name}
                         onError={(e) => { 
                           e.target.style.display = 'none'; 

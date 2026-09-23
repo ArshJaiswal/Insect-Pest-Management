@@ -523,6 +523,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { translations } from '../lib/languages.js';
 import LanguageSelector from './LanguageSelector.jsx';
+import { API_BASE_URL } from '../lib/api';
 
 // Animated SVG Icons
 const MicrophoneIcon = ({ isRecording }) => (
@@ -765,10 +766,7 @@ const Chatbot = () => {
 
       console.log('📚 Conversation history length:', conversationHistory.length);
 
-      // Try the full URL first to see if it's a proxy issue
-      const apiUrl = window.location.hostname === 'localhost' 
-        ? 'http://localhost:5000/api/chatbot/chat'
-        : '/api/chatbot/chat';
+      const apiUrl = `${API_BASE_URL}/api/chatbot/chat`;
       
       console.log('🔗 Using API URL:', apiUrl);
 
@@ -1156,9 +1154,7 @@ const Chatbot = () => {
       }));
       formData.append('conversationHistory', JSON.stringify(conversationHistory));
 
-      const apiUrl = window.location.hostname === 'localhost' 
-        ? 'http://localhost:5000/api/chatbot/analyze-image'
-        : '/api/chatbot/analyze-image';
+      const apiUrl = `${API_BASE_URL}/api/chatbot/analyze-image`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',

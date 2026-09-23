@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.jsx';
 import Navbar from '../components/Navbar.jsx';
 import axios from 'axios';
+import { API_BASE_URL } from '../lib/api';
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
@@ -12,8 +13,8 @@ const Dashboard = () => {
     const fetchCounts = async () => {
       try {
         const [cropsRes, pestsRes] = await Promise.allSettled([
-          axios.get('http://localhost:5000/api/crops'),
-          axios.get('http://localhost:5000/api/pests')
+          axios.get(`${API_BASE_URL}/api/crops`),
+          axios.get(`${API_BASE_URL}/api/pests`)
         ]);
         setStats({
           crops: cropsRes.status === 'fulfilled' ? cropsRes.value.data.length : 10,

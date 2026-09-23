@@ -4,6 +4,7 @@ import axios from 'axios';
 import Navbar from '../components/Navbar.jsx';
 import BackButton from '../components/BackButton.jsx';
 import { AuthContext } from '../context/AuthContext.jsx';
+import { API_BASE_URL } from '../lib/api';
 
 const Feedback = () => {
   const { user } = useContext(AuthContext);
@@ -45,7 +46,7 @@ const Feedback = () => {
     try {
       console.log('📝 Submitting feedback:', formData);
 
-      const response = await axios.post('http://localhost:5000/api/feedback', formData);
+      const response = await axios.post(`${API_BASE_URL}/api/feedback`, formData);
 
       console.log('✅ Feedback submitted successfully:', response.data);
 

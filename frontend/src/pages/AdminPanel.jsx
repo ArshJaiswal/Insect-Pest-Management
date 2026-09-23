@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar.jsx';
 import BackButton from '../components/BackButton.jsx';
+import { API_BASE_URL } from '../lib/api';
 
 const AdminPanel = () => {
   const location = useLocation();
@@ -24,6 +25,7 @@ const AdminPanel = () => {
     if (tab && ['crops', 'pests', 'feedback'].includes(tab) && tab !== activeTab) {
       setActiveTab(tab);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);
 
   // Debug log to track activeTab changes
@@ -31,6 +33,7 @@ const AdminPanel = () => {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const fetchData = async () => {
@@ -50,17 +53,17 @@ const AdminPanel = () => {
       
       if (activeTab === 'crops') {
         console.log('🌾 Fetching crops data...');
-        const res = await axios.get('http://localhost:5000/api/crops', config);
+        const res = await axios.get(`${API_BASE_URL}/api/crops`, config);
         console.log('✅ Crops data received:', res.data?.length || 0, 'items');
         setCrops(res.data || []);
       } else if (activeTab === 'pests') {
         console.log('🐛 Fetching pests data...');
-        const res = await axios.get('http://localhost:5000/api/pests', config);
+        const res = await axios.get(`${API_BASE_URL}/api/pests`, config);
         console.log('✅ Pests data received:', res.data?.length || 0, 'items');
         setPests(res.data || []);
       } else if (activeTab === 'feedback') {
         console.log('💬 Fetching feedback data...');
-        const res = await axios.get('http://localhost:5000/api/feedback', config);
+        const res = await axios.get(`${API_BASE_URL}/api/feedback`, config);
         console.log('✅ Feedback data received:', res.data?.feedback?.length || 0, 'items');
         setFeedback(res.data?.feedback || []);
         setFeedbackStats(res.data?.statistics || {});
@@ -105,7 +108,7 @@ const AdminPanel = () => {
         const imageFormData = new FormData();
         imageFormData.append('image', imageFile);
         
-        const uploadRes = await axios.post('http://localhost:5000/api/upload', imageFormData, {
+        const uploadRes = await axios.post(`${API_BASE_URL}/api/upload`, imageFormData, {
           headers: { 
             'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${token}`
@@ -131,7 +134,7 @@ const AdminPanel = () => {
         };
       }
       
-      await axios.post(`http://localhost:5000${endpoint}`, dataToSubmit, config);
+      await axios.post(`${API_BASE_URL}${endpoint}`, dataToSubmit, config);
       
       setFormData({});
       setImageFile(null);
@@ -161,7 +164,7 @@ const AdminPanel = () => {
         endpoint = '/api/feedback';
       }
       
-      await axios.delete(`http://localhost:5000${endpoint}/${id}`, config);
+      await axios.delete(`${API_BASE_URL}${endpoint}/${id}`, config);
       fetchData();
     } catch (err) {
       console.error('Error:', err);
@@ -176,7 +179,7 @@ const AdminPanel = () => {
         headers: { Authorization: `Bearer ${token}` }
       };
       
-      await axios.put(`http://localhost:5000/api/feedback/${id}`, {
+      await axios.put(`${API_BASE_URL}/api/feedback/${id}`, {
         status
       }, config);
       
@@ -698,8 +701,8 @@ const AdminPanel = () => {
                                 <img
                                   src={
                                     activeTab === 'crops' 
-                                      ? (item.image.startsWith('http') ? item.image : `http://localhost:5000${item.image}`)
-                                      : (item.images[0].startsWith('http') ? item.images[0] : `http://localhost:5000${item.images[0]}`)
+                                      ? (item.image.startsWith('http') ? item.image : `${API_BASE_URL}${item.image}`)
+                                      : (item.images[0].startsWith('http') ? item.images[0] : `${API_BASE_URL}${item.images[0]}`)
                                   }
                                   alt={item.name}
                                   className="w-full h-full object-cover"

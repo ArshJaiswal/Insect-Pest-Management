@@ -6,9 +6,20 @@ const { identifyPestFromImage } = require('../services/pestIdentification');
 
 const router = express.Router();
 
+const fs = require('fs');
+
+// Ensure upload directory exists
+const uploadsFolder = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsFolder)) {
+  fs.mkdirSync(uploadsFolder, { recursive: true });
+}
+
 // Configure multer for file upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
+    if (!fs.existsSync(uploadsFolder)) {
+      fs.mkdirSync(uploadsFolder, { recursive: true });
+    }
     cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
@@ -31,8 +42,8 @@ const upload = multer({
   }
 });
 
-// Upload image for pest identification
-router.post('/identify', auth, upload.single('image'), async (req, res) => {
+// Upload image for pest identification (accessible for all users)
+router.post('/identify', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No image uploaded' });

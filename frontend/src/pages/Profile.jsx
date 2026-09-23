@@ -3,6 +3,7 @@ import { AuthContext } from '../context/AuthContext.jsx';
 import Navbar from '../components/Navbar.jsx';
 import BackButton from '../components/BackButton.jsx';
 import axios from 'axios';
+import { API_BASE_URL } from '../lib/api';
 
 const Profile = () => {
   const { user } = useContext(AuthContext);
@@ -31,7 +32,7 @@ const Profile = () => {
     setLoading(true);
 
     try {
-      const res = await axios.put('http://localhost:5000/api/user/change-password', {
+      const res = await axios.put(`${API_BASE_URL}/api/user/change-password`, {
         currentPassword,
         newPassword
       });

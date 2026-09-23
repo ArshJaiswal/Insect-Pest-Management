@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../lib/api';
 import Navbar from '../components/Navbar.jsx';
 import BackButton from '../components/BackButton.jsx';
 import PestManagementAdvisory from '../components/PestManagementAdvisory.jsx';
@@ -60,13 +61,19 @@ const PestIdentification = () => {
     formData.append('image', selectedFile);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/upload/identify', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const token = localStorage.getItem('token');
+      const headers = { 'Content-Type': 'multipart/form-data' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await axios.post(`${API_BASE_URL}/api/upload/identify`, formData, { headers });
       setResult(res.data);
       setLoading(false);
     } catch (err) {
-      setError(err.response?.data?.message || 'Pest identification failed. Please try a clearer photo.');
+      console.error('Identification request error:', err);
+      const msg = err.response?.data?.error || err.response?.data?.message || 'Pest identification failed. Please try a clearer photo.';
+      setError(msg);
       setLoading(false);
     }
   };

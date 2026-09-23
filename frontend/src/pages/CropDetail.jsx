@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar.jsx';
 import BackButton from '../components/BackButton.jsx';
+import { API_BASE_URL } from '../lib/api';
 
 const CropDetail = () => {
   const { id } = useParams();
@@ -11,11 +12,12 @@ const CropDetail = () => {
 
   useEffect(() => {
     fetchCrop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchCrop = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/crops/${id}`);
+      const res = await axios.get(`${API_BASE_URL}/api/crops/${id}`);
       setCrop(res.data);
       setLoading(false);
     } catch (err) {
@@ -89,7 +91,7 @@ const CropDetail = () => {
             <div className="lg:w-96 relative bg-gradient-to-br from-emerald-100 to-teal-50 flex items-center justify-center p-8 border-b lg:border-b-0 lg:border-r border-slate-100 min-h-[260px] overflow-hidden">
               {crop.image ? (
                 <img
-                  src={crop.image.startsWith('http') ? crop.image : `http://localhost:5000${crop.image}`}
+                  src={crop.image.startsWith('http') ? crop.image : `${API_BASE_URL}${crop.image}`}
                   alt={crop.name}
                   onError={(e) => { 
                     e.target.style.display = 'none'; 

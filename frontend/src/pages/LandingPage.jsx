@@ -429,25 +429,25 @@ const LandingPage = () => {
             <div>
               <h3 className="text-white font-bold mb-4">Product</h3>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-green-400 transition">Features</a></li>
-                <li><a href="#" className="hover:text-green-400 transition">Pricing</a></li>
-                <li><a href="#" className="hover:text-green-400 transition">Security</a></li>
+                <li><a href="#features" className="hover:text-green-400 transition">Features</a></li>
+                <li><a href="#hero" className="hover:text-green-400 transition">Pricing</a></li>
+                <li><a href="#hero" className="hover:text-green-400 transition">Security</a></li>
               </ul>
             </div>
             <div>
               <h3 className="text-white font-bold mb-4">Company</h3>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-green-400 transition">About</a></li>
-                <li><a href="#" className="hover:text-green-400 transition">Blog</a></li>
-                <li><a href="#" className="hover:text-green-400 transition">Contact</a></li>
+                <li><a href="#hero" className="hover:text-green-400 transition">About</a></li>
+                <li><a href="#hero" className="hover:text-green-400 transition">Blog</a></li>
+                <li><a href="#hero" className="hover:text-green-400 transition">Contact</a></li>
               </ul>
             </div>
             <div>
               <h3 className="text-white font-bold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-green-400 transition">Privacy</a></li>
-                <li><a href="#" className="hover:text-green-400 transition">Terms</a></li>
-                <li><a href="#" className="hover:text-green-400 transition">Cookie Policy</a></li>
+                <li><a href="#hero" className="hover:text-green-400 transition">Privacy</a></li>
+                <li><a href="#hero" className="hover:text-green-400 transition">Terms</a></li>
+                <li><a href="#hero" className="hover:text-green-400 transition">Cookie Policy</a></li>
               </ul>
             </div>
           </div>

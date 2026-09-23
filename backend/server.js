@@ -12,10 +12,31 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
+let mongoError = null;
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .then(() => {
+    mongoError = null;
+    console.log('MongoDB Connected');
+  })
+  .catch(err => {
+    mongoError = err.message;
+    console.error('MongoDB connection error:', err);
+  });
+
+// Health & diagnostics
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    readyState: mongoose.connection.readyState,
+    readyStateDesc: ['disconnected', 'connected', 'connecting', 'disconnecting'][mongoose.connection.readyState],
+    dbName: mongoose.connection.name,
+    hasMongoUri: Boolean(process.env.MONGODB_URI),
+    mongoUriHost: process.env.MONGODB_URI ? (process.env.MONGODB_URI.split('@')[1] || process.env.MONGODB_URI).split('/')[0] : null,
+    hasJwtSecret: Boolean(process.env.JWT_SECRET),
+    mongoError: mongoError
+  });
+});
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));

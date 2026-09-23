@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar.jsx';
 import BackButton from '../components/BackButton.jsx';
+import { API_BASE_URL } from '../lib/api';
 
 const CropList = () => {
   const [crops, setCrops] = useState([]);
@@ -13,11 +14,12 @@ const CropList = () => {
 
   useEffect(() => {
     fetchCrops();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchCrops = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/crops');
+      const res = await axios.get(`${API_BASE_URL}/api/crops`);
       setCrops(res.data);
       const uniqueCategories = [...new Set(res.data.map(crop => crop.category).filter(Boolean))];
       setCategories(uniqueCategories);
@@ -180,7 +182,7 @@ const CropList = () => {
                   <div className="relative h-44 bg-gradient-to-br from-emerald-100/60 to-teal-50 flex items-center justify-center overflow-hidden border-b border-slate-100">
                     {crop.image ? (
                       <img
-                        src={crop.image.startsWith('http') ? crop.image : `http://localhost:5000${crop.image}`}
+                        src={crop.image.startsWith('http') ? crop.image : `${API_BASE_URL}${crop.image}`}
                         alt={crop.name}
                         onError={(e) => {
                           e.target.style.display = 'none';
