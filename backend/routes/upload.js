@@ -40,8 +40,8 @@ router.post('/identify', auth, upload.single('image'), async (req, res) => {
 
     const imagePath = req.file.path;
     
-    // Call AI identification service
-    const identificationResult = await identifyPestFromImage(imagePath);
+    // Call AI identification service with image path and original filename
+    const identificationResult = await identifyPestFromImage(imagePath, req.file.originalname);
 
     res.json({
       message: 'Image analyzed successfully',

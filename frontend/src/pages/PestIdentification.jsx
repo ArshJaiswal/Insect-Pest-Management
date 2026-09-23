@@ -201,47 +201,94 @@ const PestIdentification = () => {
         {/* Diagnostic Results Display */}
         {result && (
           <div className="space-y-6">
-            {/* If error in result object */}
+            {/* If error / non-pest detected in result object */}
             {result.error ? (
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 sm:p-8 text-amber-900">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-2xl">⚠️</span>
-                  <h3 className="text-lg font-bold">{result.error}</h3>
+              <div className="bg-amber-50/90 border border-amber-300 rounded-3xl p-6 sm:p-8 text-amber-950 shadow-sm animate-in fade-in duration-300">
+                <div className="flex items-start gap-4 mb-3">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-200/70 text-amber-800 flex items-center justify-center text-2xl shrink-0 shadow-xs">
+                    ⚠️
+                  </div>
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-200 text-amber-900 text-xs font-bold uppercase tracking-wider mb-1.5">
+                      Input Warning
+                    </span>
+                    <h3 className="text-xl font-extrabold text-amber-950">{result.error}</h3>
+                  </div>
                 </div>
-                <p className="text-xs sm:text-sm text-amber-800 leading-relaxed mb-4">{result.note}</p>
+                <p className="text-sm text-amber-900 leading-relaxed pl-0 sm:pl-16 mb-4">{result.note}</p>
                 {result.detectedLabels && result.detectedLabels.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-amber-200/80">
-                    <p className="text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">Detected image tags:</p>
+                  <div className="mt-4 pt-4 border-t border-amber-200/80 sm:ml-16">
+                    <p className="text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">Detected subject:</p>
                     <div className="flex flex-wrap gap-1.5">
                       {result.detectedLabels.map((lbl, i) => (
-                        <span key={i} className="text-xs px-2.5 py-1 rounded-md bg-white border border-amber-200 text-amber-800">
+                        <span key={i} className="text-xs px-3 py-1 rounded-lg bg-white border border-amber-300/80 font-medium text-amber-900 shadow-xs">
                           {lbl}
                         </span>
                       ))}
                     </div>
                   </div>
                 )}
+                <div className="mt-5 pt-4 border-t border-amber-200/80 sm:ml-16 flex items-center gap-2 text-xs text-amber-800 font-medium">
+                  <span>💡</span>
+                  <span>Tip: For accurate agricultural diagnosis, upload a clear photo of an insect specimen or crop leaf showing symptoms.</span>
+                </div>
               </div>
             ) : (() => {
               const activePest = result.primaryMatch?.pest || result.pest || result.primaryMatch || {};
-              const pestName = activePest.name || result.primaryMatch?.name || result.pestName || 'Identified Pest';
+              const pestName = activePest.name || result.primaryMatch?.name || result.pestName || 'Identified Specimen';
               const scientificName = activePest.scientificName || result.primaryMatch?.scientificName || '';
               const confidence = Math.round(result.primaryMatch?.confidence || result.confidence || 85);
               const description = activePest.description || result.primaryMatch?.description || result.note || '';
+              const isHousehold = result.isHouseholdPest || activePest.category?.includes('Household') || /cockroach|roach/i.test(pestName);
+              const isBeneficial = result.isBeneficial || activePest.category?.includes('Beneficial') || /ladybird|ladybug/i.test(pestName);
+              const warningText = result.warning || activePest.warning;
 
               return (
                 /* Success Result Card */
-                <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-6 sm:p-8">
+                <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-6 sm:p-8 animate-in fade-in duration-300">
+                  {/* Warning / Informative Banner if non-crop or beneficial */}
+                  {warningText && (
+                    <div className={`mb-6 p-4 sm:p-5 rounded-2xl border flex items-start gap-3.5 text-xs sm:text-sm ${
+                      isBeneficial
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                        : isHousehold
+                        ? 'bg-amber-50 border-amber-200 text-amber-900'
+                        : 'bg-blue-50 border-blue-200 text-blue-900'
+                    }`}>
+                      <span className="text-2xl shrink-0">{isBeneficial ? '🌿' : isHousehold ? '🏠' : 'ℹ️'}</span>
+                      <div>
+                        <p className="font-bold text-sm mb-0.5">
+                          {isBeneficial ? 'Beneficial Insect' : isHousehold ? 'Household / Structural Pest Notice' : 'Agronomic Classification'}
+                        </p>
+                        <p className="leading-relaxed opacity-95">{warningText}</p>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 mb-6">
                     <div>
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold mb-2">
-                        <span>✅</span>
-                        <span>Diagnosis Complete</span>
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+                          <span>✅</span>
+                          <span>Diagnosis Complete</span>
+                        </div>
+                        {isHousehold && (
+                          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">
+                            <span>🏠</span>
+                            <span>Household / Storage Pest</span>
+                          </div>
+                        )}
+                        {isBeneficial && (
+                          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+                            <span>🌿</span>
+                            <span>Beneficial Predator</span>
+                          </div>
+                        )}
                       </div>
                       <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
                         {pestName}
                       </h2>
-                      {scientificName && (
+                      {scientificName && scientificName !== 'N/A' && (
                         <p className="text-sm font-serif italic text-emerald-700 mt-0.5">
                           {scientificName}
                         </p>

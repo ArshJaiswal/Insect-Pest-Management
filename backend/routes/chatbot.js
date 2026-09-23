@@ -201,54 +201,61 @@ router.post('/chat', async (req, res) => {
 
     // 1. Try Google Gemini API if configured
     const geminiKey = process.env.GEMINI_API_KEY;
-    const geminiModel = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+    const candidateModels = [
+      process.env.GEMINI_MODEL || 'gemini-3.5-flash',
+      'gemini-3.5-flash',
+      'gemini-flash-latest',
+      'gemini-3.6-flash'
+    ].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i);
 
     if (geminiKey) {
-      try {
-        console.log(`🤖 Calling Google Gemini API (${geminiModel})...`);
-        const contents = [];
-        
-        // Add conversation history
-        conversationHistory.slice(-6).forEach(m => {
+      for (const geminiModel of candidateModels) {
+        try {
+          console.log(`🤖 Calling Google Gemini API (${geminiModel})...`);
+          const contents = [];
+          
+          // Add conversation history
+          conversationHistory.slice(-6).forEach(m => {
+            contents.push({
+              role: m.role === 'assistant' ? 'model' : 'user',
+              parts: [{ text: m.content }]
+            });
+          });
+          
+          // Add current message
           contents.push({
-            role: m.role === 'assistant' ? 'model' : 'user',
-            parts: [{ text: m.content }]
+            role: 'user',
+            parts: [{ text: message }]
           });
-        });
-        
-        // Add current message
-        contents.push({
-          role: 'user',
-          parts: [{ text: message }]
-        });
 
-        const geminiRes = await axios.post(
-          `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiKey}`,
-          {
-            system_instruction: {
-              parts: [{
-                text: `You are AgroGuard AI Assistant, an expert agricultural advisor and crop specialist. Provide practical, farmer-friendly, accurate advice on crop health, pest identification, symptom diagnosis, fertilizers, irrigation, and integrated pest management (IPM). Include emojis and clear bullet points. Language: ${language}.`
-              }]
+          const geminiRes = await axios.post(
+            `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiKey}`,
+            {
+              system_instruction: {
+                parts: [{
+                  text: `You are AgroGuard AI Assistant, an expert agricultural advisor and crop specialist. Provide practical, farmer-friendly, accurate advice on crop health, pest identification, symptom diagnosis, fertilizers, irrigation, and integrated pest management (IPM). Include emojis and clear bullet points. Language: ${language}.`
+                }]
+              },
+              contents: contents
             },
-            contents: contents
-          },
-          {
-            headers: { 'Content-Type': 'application/json' },
-            timeout: 25000
-          }
-        );
+            {
+              headers: { 'Content-Type': 'application/json' },
+              timeout: 25000
+            }
+          );
 
-        const aiText = geminiRes.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (aiText && aiText.trim()) {
-          console.log('✅ Google Gemini AI responded successfully');
-          return res.json({
-            success: true,
-            response: aiText.trim(),
-            timestamp: new Date().toISOString()
-          });
+          const aiText = geminiRes.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (aiText && aiText.trim()) {
+            console.log(`✅ Google Gemini AI responded successfully using ${geminiModel}`);
+            return res.json({
+              success: true,
+              response: aiText.trim(),
+              timestamp: new Date().toISOString()
+            });
+          }
+        } catch (geminiErr) {
+          console.warn(`⚠️ Gemini API model ${geminiModel} failed:`, geminiErr.response?.data?.error?.message || geminiErr.message);
         }
-      } catch (geminiErr) {
-        console.warn('⚠️ Gemini API call failed, falling back to local database knowledge base:', geminiErr.response?.data?.error?.message || geminiErr.message);
       }
     }
 
@@ -348,62 +355,69 @@ router.post('/analyze-image', upload.single('image'), async (req, res) => {
 
     const { message = 'Please analyze this image for pest identification', language = 'en' } = req.body;
     const geminiKey = process.env.GEMINI_API_KEY;
-    const geminiModel = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+    const candidateModels = [
+      process.env.GEMINI_MODEL || 'gemini-3.5-flash',
+      'gemini-3.5-flash',
+      'gemini-flash-latest',
+      'gemini-3.6-flash'
+    ].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i);
 
     // 1. Try Google Gemini Multimodal Vision
     if (geminiKey) {
-      try {
-        console.log(`📷 Calling Google Gemini Vision (${geminiModel})...`);
-        const mimeType = req.file.mimetype || 'image/jpeg';
-        const base64Data = req.file.buffer.toString('base64');
+      for (const geminiModel of candidateModels) {
+        try {
+          console.log(`📷 Calling Google Gemini Vision (${geminiModel})...`);
+          const mimeType = req.file.mimetype || 'image/jpeg';
+          const base64Data = req.file.buffer.toString('base64');
 
-        const geminiVisionRes = await axios.post(
-          `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiKey}`,
-          {
-            contents: [
-              {
-                role: 'user',
-                parts: [
-                  {
-                    text: `You are an expert agricultural entomologist and plant pathologist for AgroGuard.
+          const geminiVisionRes = await axios.post(
+            `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiKey}`,
+            {
+              contents: [
+                {
+                  role: 'user',
+                  parts: [
+                    {
+                      text: `You are an expert agricultural entomologist and plant pathologist for AgroGuard.
 Analyze this image:
 1. Verification: Is this agricultural content (plant, leaf, crop, insect, or pest)? If not, clearly state what it is.
-2. If agricultural:
-   - Identify the Pest or Disease (Common Name & Scientific Name).
+2. If agricultural or insect/pest:
+   - Identify the Pest or Disease or Insect (Common Name & Scientific Name).
    - Estimated Confidence (e.g., 90%).
    - Observable Symptoms & Damage Assessment.
    - Recommended Organic / Biological Control (e.g. Neem oil, natural predators).
    - Recommended Chemical Control (if threshold exceeded).
    - Preventive Agronomic Advice.
 Keep it practical and structured with clean markdown headings and emojis.`
-                  },
-                  {
-                    inline_data: {
-                      mime_type: mimeType,
-                      data: base64Data
+                    },
+                    {
+                      inline_data: {
+                        mime_type: mimeType,
+                        data: base64Data
+                      }
                     }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            headers: { 'Content-Type': 'application/json' },
-            timeout: 35000
-          }
-        );
+                  ]
+                }
+              ]
+            },
+            {
+              headers: { 'Content-Type': 'application/json' },
+              timeout: 35000
+            }
+          );
 
-        const visionText = geminiVisionRes.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (visionText && visionText.trim()) {
-          console.log('✅ Gemini Vision analyzed image successfully');
-          return res.json({
-            success: true,
-            response: visionText.trim(),
-            timestamp: new Date().toISOString()
-          });
+          const visionText = geminiVisionRes.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (visionText && visionText.trim()) {
+            console.log(`✅ Gemini Vision analyzed image successfully using ${geminiModel}`);
+            return res.json({
+              success: true,
+              response: visionText.trim(),
+              timestamp: new Date().toISOString()
+            });
+          }
+        } catch (visionErr) {
+          console.warn(`⚠️ Gemini Vision model ${geminiModel} failed:`, visionErr.response?.data?.error?.message || visionErr.message);
         }
-      } catch (visionErr) {
-        console.warn('⚠️ Gemini Vision call failed, falling back to local analysis:', visionErr.response?.data?.error?.message || visionErr.message);
       }
     }
 

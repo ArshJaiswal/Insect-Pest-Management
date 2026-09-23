@@ -181,6 +181,62 @@ const PestManagementAdvisory = ({ pest, confidence }) => {
           'Dinotefuran 20% SG (0.4g/L water)',
           '⚠️ Direct spray nozzles strictly to the base of the plant canopy'
         ]
+      },
+      'Cockroach': {
+        lifeCycle: 'Incomplete metamorphosis (egg case/ootheca → nymph stages → adult). Nocturnal scavenger thriving in warm, damp, dark harborages.',
+        damageSymptoms: [
+          'Visual sighting of insects scurrying in dark or moist locations',
+          'Fecal droppings resembling black pepper granules or dark smears',
+          'Pungent, musty aggregation pheromone odor in enclosed areas',
+          'Contamination of food storage, packaging, grains, and kitchen surfaces'
+        ],
+        culturalControl: [
+          'Sanitation: Wipe counters, eliminate food debris, and store grains/produce in airtight containers',
+          'Moisture Control: Fix plumbing leaks, repair dripping faucets, and eliminate standing water',
+          'Food waste management: Dispose of organic refuse daily in sealed trash bins',
+          'Inspect incoming cardboard boxes and storage crates before bringing them indoors'
+        ],
+        mechanicalControl: [
+          'Exclusion: Seal wall voids, baseboards, pipe penetrations, and door sweeps with silicone caulk',
+          'Deploy non-toxic insect sticky glue boards along walls, under sinks, and behind appliances',
+          'Vacuum congregating harborages using a HEPA-filtered vacuum'
+        ],
+        biologicalControl: [
+          'Apply food-grade Diatomaceous Earth (DE) in wall voids and dry crevices (destroys cuticle naturally)',
+          'Utilize boric acid powder in thin, barely visible layers inside hidden crevices and voids',
+          'Avoid broad-spectrum chemical sprays that scatter colonies deeper into wall cavities'
+        ],
+        chemicalControl: [
+          'Targeted Gel Baits: Apply pea-sized dots of Fipronil 0.05%, Indoxacarb 0.6%, or Hydramethylnon gel',
+          'Insect Growth Regulators (IGR): Pyriproxyfen or Hydroprene to arrest nymph molting and sterilize adults',
+          '⚠️ Place baits strictly in hidden crevices out of reach of children and domestic animals'
+        ]
+      },
+      'Ladybird': {
+        lifeCycle: 'Complete metamorphosis (egg → alligator-like larva → pupa → adult). Both larvae and adults are voracious aphid predators.',
+        damageSymptoms: [
+          '✅ Zero crop damage — Beneficial predator organism!',
+          'Active feeding on aphid colonies, mealybugs, scales, and mites',
+          'Presence of beneficial yellow clustered eggs on leaf undersides'
+        ],
+        culturalControl: [
+          'Plant flowering companion crops (marigold, dill, fennel, alyssum) to attract adult beetles',
+          'Avoid broad-spectrum synthetic pyrethroids that destroy beneficial insect populations',
+          'Maintain natural vegetative mulch for beetle overwintering habitat'
+        ],
+        mechanicalControl: [
+          'Do not disturb clusters of ladybirds overwintering in mulch or field edges',
+          'Transfer ladybird larvae to aphid-dense branches by hand or soft brush'
+        ],
+        biologicalControl: [
+          'Conserve existing wild populations as primary biological defense against soft-bodied pests',
+          'Supplemental release of Hippodamia convergens or Coccinella septempunctata in greenhouses'
+        ],
+        chemicalControl: [
+          '🛑 NO CHEMICAL CONTROL RECOMMENDED: This is a beneficial insect, not a pest!',
+          'If target pests (e.g. aphids) require intervention, use selective biopesticides like cold-pressed Neem oil (0.5%)',
+          'Ensure spray applications occur during dawn or dusk when ladybirds are less active'
+        ]
       }
     };
 
